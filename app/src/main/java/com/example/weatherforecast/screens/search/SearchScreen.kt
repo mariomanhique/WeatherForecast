@@ -17,15 +17,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.weatherforecast.navigation.WeatherScreens
 import com.example.weatherforecast.ui.theme.BgColor
+import com.example.weatherforecast.ui.theme.TxtColor
+import com.example.weatherforecast.utils.fontFamily
 import com.example.weatherforecast.widgets.WeatherAppBar
 
 @Composable
@@ -43,10 +54,10 @@ fun MainScaffold(navController: NavController){
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 WeatherAppBar(
                     title = "Search",
-                    isSearchScreen = true,
+                    isMainScreenOrRelated=false,
                     timestamp = "",
                     icon = Icons.Default.ArrowBack,
-                    onNavigationClick = {
+                    onBackClicked = {
                         navController.popBackStack()
                     },
                     onSearchClick = { /*TODO*/ }) {
@@ -63,7 +74,7 @@ fun MainScaffold(navController: NavController){
 
         Column(modifier = Modifier.padding(paddingValues)) {
             
-            MainContent()
+            MainContent(navController = navController)
 
         }
 
@@ -71,10 +82,20 @@ fun MainScaffold(navController: NavController){
 }
 
 @Composable
-fun MainContent(){
+fun MainContent(navController: NavController){
     Column(verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally) {
+        SearchBar{
 
+//            Log.d("TAG", "MainContent: $it")
+//            navController.popBackStack()
+            navController.navigate(WeatherScreens.MainScreen.name+"/$it"){
+                popUpTo(WeatherScreens.SearchScreen.name){
+                    inclusive=true
+                }
+            }
+
+        }
     }
 }
 
@@ -91,15 +112,23 @@ fun CommonTextField(valueState: MutableState<String>,
         valueState.value=it
     },
     label = {
-        Text(text = placeholder)
+        Text(text = placeholder,
+            style= TextStyle(
+                color = TxtColor,
+                fontSize = 14.sp,
+                fontFamily = fontFamily("Chakra Petch", FontWeight.SemiBold, FontStyle.Normal)
+            )
+            )
     },
     maxLines = 1,
     singleLine = true,
     keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
     keyboardActions = onAction,
     colors = TextFieldDefaults.outlinedTextFieldColors(
-        focusedBorderColor = Color.Blue,
-        cursorColor = Color.Black
+        containerColor= Color(0xff202328),
+        textColor = TxtColor,
+        focusedBorderColor = TxtColor,
+        cursorColor = TxtColor
     ), shape = RoundedCornerShape(15.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -109,17 +138,30 @@ fun CommonTextField(valueState: MutableState<String>,
 
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchBar(onSearch:()->Unit={}){
-    //When we are dealing with forms, its good to use remember saveable
-//    val searchQueryState = rememberSaveable(inputs = , stateSaver = ) {
-//
-//    }
-//    Column() {
-//        CommonTextField(
-//            valueState = searchQueryState,
-//            placeholder= "Seattle",
-//            onAction = KeyboardActions {  }
-//        )
-//    }
+fun SearchBar(
+    onSearch:(String)->Unit={}){
+//    When we are dealing with forms, its good to use remember saveable
+    val searchQueryState = rememberSaveable{
+            mutableStateOf("")
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val valid = remember(searchQueryState.value) {// We are passing the variable that we want to operate on
+            searchQueryState.value.trim().isNotEmpty()
+    }
+
+    Column{
+        CommonTextField(
+            valueState = searchQueryState,
+            placeholder= "Seattle",
+            onAction = KeyboardActions {
+                if(!valid) return@KeyboardActions //return nothing
+                onSearch(searchQueryState.value.trim())
+                searchQueryState.value=""
+                keyboardController?.hide()
+            }
+        )
+    }
 }

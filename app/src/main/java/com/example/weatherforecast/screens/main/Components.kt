@@ -1,13 +1,9 @@
 package com.example.weatherforecast.screens.main
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,37 +11,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextGeometricTransform
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.weatherforecast.R
-import com.example.weatherforecast.model.Weather
 import com.example.weatherforecast.model.WeatherItem
 import com.example.weatherforecast.ui.theme.TxtColor
 import com.example.weatherforecast.utils.fontFamily
@@ -67,7 +49,7 @@ fun CurrentForecast(
                         .padding(5.dp)
                         .size(30.dp)
                    )
-        Text(text = "$weatherItemInfo",
+        Text(text = weatherItemInfo,
             style= TextStyle(
                 color = TxtColor,
                 fontSize = 19.sp,
@@ -76,7 +58,7 @@ fun CurrentForecast(
             )
         )
 
-        Text(text = "$weatherItem",
+        Text(text = weatherItem,
             style=TextStyle(
                 color = Color.Gray,
                 fontSize = 16.sp,
@@ -90,9 +72,8 @@ fun CurrentForecast(
 fun WeatherStateImage(imageUrl:String){
     AsyncImage(model = imageUrl,
         contentDescription = "",
-        modifier = Modifier.size(120.dp))
+        modifier = Modifier.size(90.dp).scale(1.5f))
 
-//    Image(painter = rememberAsyncImagePainter(model = imageUrl), contentDescription = "", modifier = Modifier.size(120.dp))
 }
 
 
@@ -116,7 +97,7 @@ fun SunsetSunriseRaw(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally) {
 
-        Text(text = "$weatherItem",
+        Text(text = weatherItem,
             style=TextStyle(
                 color = Color.Gray,
                 fontSize = 16.sp,
@@ -130,7 +111,7 @@ fun SunsetSunriseRaw(
                 .size(30.dp),
                 contentScale = ContentScale.Fit
         )
-        Text(text = "$weatherItemInfo",
+        Text(text = weatherItemInfo,
             style= TextStyle(
                 color = TxtColor,
                 fontSize = 19.sp,
@@ -194,7 +175,7 @@ fun DayRowForecast(dayOfWeek:String,minTemp:String,maxTemp:String,imageUrl: Stri
         verticalAlignment = Alignment.CenterVertically
         ){
 
-        val gradient = Brush.linearGradient(listOf( Color(0xFF24F3A1), Color(0xFF0DB3DB)))
+//        val gradient = Brush.linearGradient(listOf( Color(0xFF24F3A1), Color(0xFF0DB3DB)))
         Text(text = dayOfWeek,
             color = TxtColor,
             fontSize = 19.sp,

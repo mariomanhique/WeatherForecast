@@ -15,11 +15,11 @@ fun fontFamily(fontName:String,fontWeight: FontWeight,fontStyle: FontStyle):Font
         certificates = R.array.com_google_android_gms_fonts_certs
     )
 
-    val fontName = GoogleFont(fontName)
+    val fontNam = GoogleFont(fontName)
 
    return FontFamily(
         Font(
-            googleFont = fontName,
+            googleFont = fontNam,
             fontProvider=provider,
             weight = fontWeight,
             style= fontStyle)
