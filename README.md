@@ -21,4 +21,12 @@ Tech stack
 
 Feel free to clone it for your personal purpose or to update it. Just hit me up if its the second option 😊
 
-![nextDaysF](https://github.com/MErnesto99/WeatherForecast/assets/79359430/340d218c-5a9d-47f7-ab87-72d4548ad372)
+<img src="https://i.ibb.co/Jq6V5fP/next-Days-F.png" width="200" alt="next-Days-F" border="0">
+<img src="https://i.ibb.co/2kdvS8C/nextDays.png" width="200" alt="nextDays" border="0">
+<img src="https://i.ibb.co/L6LWPSs/fav-Screen.png" width="200" alt="fav-Screen" border="0">
+<img src="https://i.ibb.co/SfKRkNr/about-Screen.png" width="200" alt="about-Screen" border="0">
+<img src="https://i.ibb.co/92VfnK5/Settings.png" width="200" alt="Settings" border="0">
+<img src="https://i.ibb.co/drTkNHR/dropMenu.png" width="200" alt="dropMenu" border="0">
+<img src="https://i.ibb.co/qxbbKGK/search-Screen.png" width="200" alt="search-Screen" border="0">
+<img src="https://i.ibb.co/5RmFkQz/screen1.png" width="200" alt="screen1" border="0">
+
