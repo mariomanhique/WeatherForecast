@@ -223,7 +223,7 @@ fun ShowSettingDialog(showDialog: MutableState<Boolean>, navController: NavContr
 
 @Composable
 fun TextButtonsFilters(onTextClicked:(String)->Unit){
-    val list = listOf("Today","Tomorrow","Next 10 Days")
+    val list = listOf("Today","Tomorrow","Next 7 Days")
 
     var buttonState by remember {
         mutableStateOf(0)

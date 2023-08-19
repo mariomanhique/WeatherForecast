@@ -128,7 +128,7 @@ fun SunsetSunriseRaw(
 
 
 @Composable
-fun HumidityWindPressure(weather: WeatherItem){
+fun HumidityWindPressure(weather: WeatherItem,isImperial:Boolean){
     Column(
         modifier = Modifier
             .padding(0.dp)
@@ -145,7 +145,7 @@ fun HumidityWindPressure(weather: WeatherItem){
             ) {
                 CurrentForecast(
                     weatherIcon = R.drawable.wind,
-                    weatherItemInfo = "${weather.speed} m/p",
+                    weatherItemInfo = "${weather.speed} "+ if(isImperial)"mph" else "m/s",
                     weatherItem = "Wind",
                 )
 

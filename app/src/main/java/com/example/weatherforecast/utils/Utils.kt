@@ -22,13 +22,13 @@ fun formatDayOfWeek(timestamp: Int):String{
 }
 
 fun formatDecimals(item: Double):String{
-    val celcius = (item - 32) * 5/9
-    return " %.0f".format(celcius)
+    return " %.0f".format(item)
 
 }
 
 fun formatDecimals2(item: Double):Int{
-    val celcius = (item - 32) * 5/9
-    return celcius.toInt()
+
+//    val celcius = (item - 32) * 5/9
+    return item.toInt()
 
 }

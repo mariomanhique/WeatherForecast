@@ -14,7 +14,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +37,7 @@ import com.example.weatherforecast.model.Weather
 import com.example.weatherforecast.screens.main.DayRowForecast
 import com.example.weatherforecast.screens.main.HumidityWindPressure
 import com.example.weatherforecast.screens.main.WeatherViewModel
+import com.example.weatherforecast.screens.settings.SettingsViewModel
 import com.example.weatherforecast.ui.theme.BgColor
 import com.example.weatherforecast.ui.theme.TxtColor
 import com.example.weatherforecast.utils.fontFamily
@@ -39,19 +45,45 @@ import com.example.weatherforecast.utils.formatDate
 import com.example.weatherforecast.utils.formatDayOfWeek
 import com.example.weatherforecast.utils.formatDecimals
 import com.example.weatherforecast.widgets.WeatherAppBar
+import java.lang.Exception
 
 @Composable
-fun NextDaysForecastScreen(navController: NavController,city:String?,weatherViewModel:WeatherViewModel){
+fun NextDaysForecastScreen(navController: NavController,
+                           city:String?,
+                           weatherViewModel:WeatherViewModel,
+                            settingsViewModel:SettingsViewModel){
 
-    val weatherData = produceState<DataOrException<Weather,Boolean,Exception>>(
-        initialValue = DataOrException(loading = true), producer = {
-            value = weatherViewModel.loadWeather(city!!)
-        }).value
 
-    if(weatherData.loading==true){
-        CircularProgressIndicator()
-    }else if(weatherData.data != null){
-        MainScaffold(weather = weatherData.data!!, navController = navController)
+    val unitFromDb = settingsViewModel.units.collectAsState().value
+    var unit by remember {
+        mutableStateOf("imperial")
+    }
+    var isImperial by remember {
+        mutableStateOf(false)
+    }
+
+    if(unitFromDb.isNotEmpty()){
+
+        unit = unitFromDb[0].unit.split(" ")[0].lowercase()
+        isImperial = unit=="imperial"
+
+        val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
+            initialValue = DataOrException(loading = true),
+            producer = {
+                value = weatherViewModel.loadWeather(
+                    city=city.toString(),
+                    units=unit)
+            }).value
+
+        if (weatherData.loading==true){
+            CircularProgressIndicator()
+        }else if(weatherData.data != null){
+            MainScaffold(
+                weather = weatherData.data!!,
+                navController = navController,
+            )
+        }
+
     }
 }
 
@@ -102,7 +134,7 @@ fun MainContent(modifier: Modifier,weather: Weather){
 
         }
 
-        HumidityWindPressure(weather=weatherItem)//From components
+        HumidityWindPressure(weather=weatherItem, isImperial = true)//From components
 
         Column {
             //7 days forecast rows

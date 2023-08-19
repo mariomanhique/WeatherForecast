@@ -15,11 +15,15 @@ import com.example.weatherforecast.screens.main.WeatherViewModel
 import com.example.weatherforecast.screens.nextDaysFr.NextDaysForecastScreen
 import com.example.weatherforecast.screens.search.SearchScreen
 import com.example.weatherforecast.screens.settings.SettingsScreen
+import com.example.weatherforecast.screens.settings.SettingsViewModel
 import com.example.weatherforecast.screens.splash.WeatherSplashScreen
 
 @Composable
-fun WeatherNavigation(weatherViewModel: WeatherViewModel = hiltViewModel(),
-                        favoriteViewModel: WeatherFavoriteViewModel= hiltViewModel()){
+fun WeatherNavigation(
+                    weatherViewModel: WeatherViewModel = hiltViewModel(),
+                    favoriteViewModel: WeatherFavoriteViewModel= hiltViewModel(),
+                    settingsViewModel: SettingsViewModel = hiltViewModel()
+                        ){
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = WeatherScreens.SplashScreen.name){
@@ -34,7 +38,7 @@ fun WeatherNavigation(weatherViewModel: WeatherViewModel = hiltViewModel(),
         })){navBack->
             navBack.arguments?.getString("city").let {city->
 
-                MainScreen(navController = navController,city,weatherViewModel,favoriteViewModel)
+                MainScreen(navController = navController,city,weatherViewModel,favoriteViewModel,settingsViewModel)
 
             }
 
@@ -52,7 +56,8 @@ fun WeatherNavigation(weatherViewModel: WeatherViewModel = hiltViewModel(),
             NextDaysForecastScreen(
                 navController=navController,
                 it.arguments?.getString("city"),
-                weatherViewModel=weatherViewModel)
+                weatherViewModel=weatherViewModel,
+            settingsViewModel = settingsViewModel)
         }
 
         composable(WeatherScreens.FavoriteScreen.name){
@@ -64,7 +69,7 @@ fun WeatherNavigation(weatherViewModel: WeatherViewModel = hiltViewModel(),
         }
 
         composable(WeatherScreens.SettingsScreen.name){
-            SettingsScreen(navController)
+            SettingsScreen(navController=navController,settingsViewModel)
         }
     }
 }

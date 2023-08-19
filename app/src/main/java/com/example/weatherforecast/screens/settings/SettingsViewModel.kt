@@ -34,9 +34,13 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherDBRep
     fun updateUnit(unit: Unit)=viewModelScope.launch {
         repository.updateUnit(unit = unit)
     }
-//
-//    fun deleteUnit(unit: Unit)=viewModelScope.launch {
-//
-//    }
+
+    fun deleteUnit(unit: Unit)=viewModelScope.launch {
+        repository.deleteUnit(unit=unit)
+    }
+
+    fun deleteAllUnits()=viewModelScope.launch {
+        repository.deleteAllUnits()
+    }
 //
 }

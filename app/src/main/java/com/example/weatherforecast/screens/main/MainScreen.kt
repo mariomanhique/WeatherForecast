@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.weatherforecast.R
 import com.example.weatherforecast.data.DataOrException
@@ -37,6 +39,7 @@ import com.example.weatherforecast.model.Favorite
 import com.example.weatherforecast.model.Weather
 import com.example.weatherforecast.navigation.WeatherScreens
 import com.example.weatherforecast.screens.favorites.WeatherFavoriteViewModel
+import com.example.weatherforecast.screens.settings.SettingsViewModel
 import com.example.weatherforecast.ui.theme.BgColor
 import com.example.weatherforecast.ui.theme.TxtColor
 import com.example.weatherforecast.utils.fontFamily
@@ -52,24 +55,50 @@ import java.lang.Exception
 fun MainScreen(navController: NavController,
                city:String?,
                weatherViewModel: WeatherViewModel,
-               favoriteViewModel: WeatherFavoriteViewModel){
+               favoriteViewModel: WeatherFavoriteViewModel,
+                settingsViewModel: SettingsViewModel){
 
-    val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
-        initialValue = DataOrException(loading = weatherViewModel.data.value.loading),
-        producer = {
-            value = weatherViewModel.loadWeather(city=city!!)
-        }).value
 
-    if (weatherData.loading==true){
-        CircularProgressIndicator()
-    }else if(weatherData.data != null){
-        MainScaffold(weather = weatherData.data!!, navController = navController,favoriteViewModel)
+    val unitFromDb = settingsViewModel.units.collectAsState().value
+    var unit by remember {
+        mutableStateOf("imperial")
     }
+    var isImperial by remember {
+        mutableStateOf(false)
+    }
+
+    if(unitFromDb.isNotEmpty()){
+
+        unit = unitFromDb[0].unit.split(" ")[0].lowercase()
+        isImperial = unit=="imperial"
+
+        val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
+            initialValue = DataOrException(loading = true),
+            producer = {
+                value = weatherViewModel.loadWeather(
+                                    city=city.toString(),
+                                    units=unit)
+            }).value
+
+        if (weatherData.loading==true){
+            CircularProgressIndicator()
+        }else if(weatherData.data != null){
+            MainScaffold(weather = weatherData.data!!,
+                navController = navController,
+                favoriteViewModel,
+                isImperial=isImperial)
+        }
+
+    }
+
 
 }
 
 @Composable
-fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
+fun MainContent(data:Weather,
+                modifier: Modifier,
+                navController: NavController,
+                isImperial: Boolean){
 
     val weatherItem = data.list.first()
     val imageUrl by remember {
@@ -124,7 +153,8 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
 
         //Weather details
 
-        HumidityWindPressure(weather=weatherItem) //From components
+        HumidityWindPressure(weather=weatherItem,
+                                isImperial = isImperial) //From components
 
         //Weather filter
         TextButtonsFilters{index ->
@@ -135,7 +165,7 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
                 "Tomorrow" ->{
 
                 }
-                "Next 10 Days" ->{
+                "Next 7 Days" ->{
                     navController.navigate(WeatherScreens.Next10daysScreen.name+"/${data.city.name}")
                 }
 
@@ -154,7 +184,7 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
         ) {
             SunsetSunriseRaw(
                 modifier = Modifier.padding(2.dp),
-                weatherIcon = when(formatDecimals2(weatherItem.temp.morn)){
+                weatherIcon = when(formatDecimals2(weatherItem.feels_like.morn)){
                                         in 10 .. 15 ->{R.drawable.rain}
                                         in 16 .. 18 ->{R.drawable.cloud}
                                         in 19 .. 20->{R.drawable.partialcloudy}
@@ -164,14 +194,14 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
                                         }
 
                                                                          },
-                weatherItemInfo = formatDecimals(weatherItem.temp.morn)+"º",
+                weatherItemInfo = formatDecimals(weatherItem.feels_like.morn)+"º",
                 weatherItem ="10 am"
 
             )
 
             SunsetSunriseRaw(
                 modifier = Modifier.padding(2.dp),
-                weatherIcon = when(formatDecimals2(weatherItem.temp.day)){
+                weatherIcon = when(formatDecimals2(weatherItem.feels_like.day)){
                     in 10 .. 15 ->{R.drawable.rain}
                     in 16 .. 18 ->{R.drawable.cloud}
                     in 19 .. 20->{R.drawable.partialcloudy}
@@ -179,14 +209,14 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
                     else->{
                         R.drawable.clearsky
                     }},
-                weatherItemInfo = formatDecimals(weatherItem.temp.day)+"º",
+                weatherItemInfo = formatDecimals(weatherItem.feels_like.day)+"º",
                 weatherItem ="4 pm"
 
             )
 
             SunsetSunriseRaw(
                 modifier = Modifier.padding(2.dp),
-                weatherIcon =  when(formatDecimals2(weatherItem.temp.eve)){
+                weatherIcon =  when(formatDecimals2(weatherItem.feels_like.eve)){
                     in 10 .. 15 ->{R.drawable.rain}
                     in 16 .. 18 ->{R.drawable.cloud}
                     in 19 .. 20->{R.drawable.partialcloudy}
@@ -194,13 +224,13 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
                     else->{
                         R.drawable.clearsky
                     }},
-                weatherItemInfo = formatDecimals(weatherItem.temp.eve)+"º",
+                weatherItemInfo = formatDecimals(weatherItem.feels_like.eve)+"º",
                 weatherItem ="6 PM"
 
             )
             SunsetSunriseRaw(
                 modifier = Modifier.padding(2.dp),
-                weatherIcon =  when(formatDecimals2(weatherItem.temp.night)){
+                weatherIcon =  when(formatDecimals2(weatherItem.feels_like.night)){
                     in 10..15 ->{R.drawable.rain}
                     in 16.. 18 ->{R.drawable.cloud}
                     in 19.. 20->{R.drawable.partialcloudy}
@@ -208,7 +238,7 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
                     else->{
                         R.drawable.clearsky
                     }},
-                weatherItemInfo = formatDecimals(weatherItem.temp.night)+"º",
+                weatherItemInfo = formatDecimals(weatherItem.feels_like.night)+"º",
                 weatherItem ="10 PM"
 
             )
@@ -240,7 +270,8 @@ fun MainContent(data:Weather,modifier: Modifier,navController: NavController){
 @Composable
 fun MainScaffold(weather:Weather,
                  navController: NavController,
-                 favoriteViewModel: WeatherFavoriteViewModel){
+                 favoriteViewModel: WeatherFavoriteViewModel,
+                  isImperial:Boolean){
     val showDialog = remember {
         mutableStateOf(false)
     }
@@ -298,7 +329,7 @@ fun MainScaffold(weather:Weather,
         .fillMaxSize(),
         containerColor = BgColor
     ) { paddingValues ->
-        MainContent(data = weather,modifier=Modifier.padding(paddingValues),navController)
+        MainContent(data = weather,modifier=Modifier.padding(paddingValues),navController,isImperial=isImperial)
 
     }
 

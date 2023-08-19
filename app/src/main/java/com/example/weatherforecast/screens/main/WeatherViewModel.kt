@@ -12,10 +12,10 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(private val repository: WeatherRepository):ViewModel() {
 
-    private val _data:MutableState<DataOrException<Weather,Boolean,Exception>>
-    = mutableStateOf(DataOrException(null,true,Exception("")))
-
-    var data =_data
+//    private val _data:MutableState<DataOrException<Weather,Boolean,Exception>>
+//    = mutableStateOf(DataOrException(null,true,Exception("")))
+//
+//    var data =_data
 
 
 //    private fun getWeather(city:String)=viewModelScope.launch {
@@ -31,8 +31,8 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
 //
 //    }
 
-    suspend fun loadWeather(city:String):DataOrException<Weather,Boolean,Exception>{
-        return repository.getWeather(cityQuery = city)
+    suspend fun loadWeather(city:String,units:String):DataOrException<Weather,Boolean,Exception>{
+        return repository.getWeather(cityQuery = city,units=units)
     }
 
 
